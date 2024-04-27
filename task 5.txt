@@ -1,0 +1,124 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+
+using namespace std;
+
+class Book {
+private:
+    string title;
+    string author;
+    string ISBN;
+    bool available;
+
+public:
+    Book(const string& _title, const string& _author, const string& _ISBN) : title(_title), author(_author), ISBN(_ISBN), available(true) {}
+
+    const string& getTitle() const {
+        return title;
+    }
+
+    const string& getAuthor() const {
+        return author;
+    }
+
+    const string& getISBN() const {
+        return ISBN;
+    }
+
+    bool isAvailable() const {
+        return available;
+    }
+
+    void setAvailable(bool availability) {
+        available = availability;
+    }
+};
+
+class Library {
+private:
+    map<string, Book> books;
+
+public:
+    void addBook(const Book& book) {
+        books[book.getISBN()] = book;
+    }
+
+    void searchBook(const string& query) {
+        cout << "Search Results:" << endl;
+        for (auto& pair : books) {
+            Book& book = pair.second;
+            if (book.getTitle() == query || book.getAuthor() == query || book.getISBN() == query) {
+                cout << "Title: " << book.getTitle() << ", Author: " << book.getAuthor() << ", ISBN: " << book.getISBN() << ", Available: " << (book.isAvailable() ? "Yes" : "No") << endl;
+            }
+        }
+    }
+
+    void checkoutBook(const string& ISBN) {
+        if (books.find(ISBN) != books.end() && books[ISBN].isAvailable()) {
+            books[ISBN].setAvailable(false);
+            cout << "Book checked out successfully." << endl;
+        } else {
+            cout << "Book is not available for checkout." << endl;
+        }
+    }
+
+    void returnBook(const string& ISBN) {
+        if (books.find(ISBN) != books.end() && !books[ISBN].isAvailable()) {
+            books[ISBN].setAvailable(true);
+            cout << "Book returned successfully." << endl;
+        } else {
+            cout << "Book is not checked out." << endl;
+        }
+    }
+};
+
+int main() {
+    Library library;
+
+    // Adding some sample books to the library
+    library.addBook(Book("The Catcher in the Rye", "J.D. Salinger", "9780316769488"));
+    library.addBook(Book("To Kill a Mockingbird", "Harper Lee", "9780061120084"));
+    library.addBook(Book("1984", "George Orwell", "9780451524935"));
+
+    char choice;
+    string query, ISBN;
+
+    do {
+        cout << "\nMenu:\n";
+        cout << "1. Search Book\n";
+        cout << "2. Checkout Book\n";
+        cout << "3. Return Book\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case '1':
+                cout << "Enter title, author, or ISBN to search: ";
+                cin.ignore();
+                getline(cin, query);
+                library.searchBook(query);
+                break;
+            case '2':
+                cout << "Enter ISBN of the book to checkout: ";
+                cin >> ISBN;
+                library.checkoutBook(ISBN);
+                break;
+            case '3':
+                cout << "Enter ISBN of the book to return: ";
+                cin >> ISBN;
+                library.returnBook(ISBN);
+                break;
+            case '4':
+                cout << "Exiting program." << endl;
+                break;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+                break;
+        }
+    } while (choice != '4');
+
+    return 0;
+}
